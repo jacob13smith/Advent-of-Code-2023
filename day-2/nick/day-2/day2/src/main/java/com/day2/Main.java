@@ -70,11 +70,15 @@ public class Main {
 
                 System.out.println(line);
                 System.out.println("Game Number: " + gameNumber);
-                System.out.println("Red: " + highestRed + " | Blue: " + highestBlue + " | Green: " + highestGreen);
+                int power = highestBlue * highestGreen * highestRed;
+                
+                System.out.println("Red: " + highestRed + " | Blue: " + highestBlue + " | Green: " + highestGreen + " | Power: " + power);
+                
+                // if(highestBlue <= numBlues && highestGreen <= numGreens && highestRed <= numReds){
+                //     total += gameNumber;
+                // }
 
-                if(highestBlue <= numBlues && highestGreen <= numGreens && highestRed <= numReds){
-                    total += gameNumber;
-                }
+                total += power;
 
                 line = reader.readLine();
             }
