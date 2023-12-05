@@ -33,7 +33,7 @@ public class Main {
                 for (int j = 0; j < numCols; j++) {
                     if (!Character.isDigit(array2D[i][j]) && array2D[i][j] != '.') {
                         int tempTotal = searchSurroundings(array2D, i, j);
-                        System.out.println("Temp total for " + i + "," + j + ": " + tempTotal);
+                        // System.out.println("Temp total for " + i + "," + j + ": " + tempTotal);
                         total += tempTotal;
                     }
                 }
@@ -58,10 +58,9 @@ public class Main {
                         char value = array2D[i][j];
                         if (Character.isDigit(value)) {
                             String number = extractNumberAtPosition2D(array2D, i, j);
-                            System.out.println("Number: " + number);
+                            System.out.println(number);
                             symTotal += Integer.valueOf(number);
                             // set number to not exist in the array anymore
-                            replaceNumberWithDots2D(array2D, i, j, number);
 
                         }
                     }
@@ -89,22 +88,13 @@ public class Main {
         // Extract the number
         String number = new String(input[row], startIndex + 1, endIndex - startIndex - 1);
 
-        // Optionally, convert the extracted number to dots
-        for (int i = startIndex + 1; i < endIndex; i++) {
-            input[row][i] = '.';
+        for (int i = startIndex+1; i < endIndex; i++) {
+            if(Character.isDigit(input[row][i])){
+                input[row][i] = '.';
+            }
         }
 
         return number;
-    }
-
-    public static void replaceNumberWithDots2D(char[][] input, int row, int col, String extractedNumber) {
-        int startIndex = col - (extractedNumber.length() - 1);
-        int endIndex = col + 1;
-
-        // Replace the extracted number with dots
-        for (int i = startIndex; i < endIndex; i++) {
-            input[row][i] = '.';
-        }
     }
 
 }
