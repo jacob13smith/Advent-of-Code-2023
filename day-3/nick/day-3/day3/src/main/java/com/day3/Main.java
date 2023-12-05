@@ -1,104 +1,110 @@
 package com.day3;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        BufferedReader reader;
         String filePath = "D:\\Coding\\AdventOfCode\\Advent-of-Code-2023\\day-3\\nick\\day-3\\day3\\src\\main\\resources\\input.txt";
-        // iterate and populate a map containing symbol positions
-        HashMap<Integer, List<Integer>> symbolPositions = new HashMap<Integer, List<Integer>>();
-        // <row number, list<positionsOfSymbols>>
+        int total = 0;
         try {
-            reader = new BufferedReader(new FileReader(filePath));
-            String line = reader.readLine();
-            int rowNumber = 0;
-            while (line != null) {
+            Scanner scanner = new Scanner(new File(filePath));
+            StringBuilder inputBuilder = new StringBuilder();
+            while (scanner.hasNextLine()) {
+                inputBuilder.append(scanner.nextLine()).append("\n");
+            }
+            scanner.close();
 
-                for (int i = 0; i < line.length(); i++) {
-                    char currentChar = line.charAt(i);
+            String[] inputLines = inputBuilder.toString().trim().split("\n");
 
-                    if (!Character.isDigit(currentChar) && currentChar != '.') {
-                        // char is symbol, put into hashmap for the next line
-                        addValue(symbolPositions, rowNumber, i);
-                    }
+            int numRows = inputLines.length;
+            int numCols = inputLines[0].length();
+
+            char[][] array2D = new char[numRows][numCols];
+
+            for (int i = 0; i < numRows; i++) {
+                for (int j = 0; j < numCols; j++) {
+                    array2D[i][j] = inputLines[i].charAt(j);
                 }
-                rowNumber++;
-                line = reader.readLine();
             }
 
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            reader = new BufferedReader(new FileReader(filePath));
-            String line = reader.readLine();
-            while (line != null) {
-                for (int i = 0; i < line.length(); i++) {
-                    char currentChar = line.charAt(i);
-                    List<Integer> thisRowSymbols = symbolPositions.get(1);
-                    for (Integer val : thisRowSymbols) {
-                        System.out.println(val);
+            for (int i = 0; i < numRows; i++) {
+                for (int j = 0; j < numCols; j++) {
+                    if (!Character.isDigit(array2D[i][j]) && array2D[i][j] != '.') {
+                        int tempTotal = searchSurroundings(array2D, i, j);
+                        System.out.println("Temp total for " + i + "," + j + ": " + tempTotal);
+                        total += tempTotal;
                     }
-                    if (Character.isDigit(currentChar)) {
-                        // char is number
-                        int endIndex = findEndIndex(line, i);
-                        String number = line.substring(i, endIndex + 1);
-                        int startPosition = i;
-                        int endPosition = i + number.length() - 1;
-
-                        // System.out.println(
-                        // "Number: " + number + ", Position: " + startPosition + ", EndPosition: " +
-                        // endPosition);
-
-                        if (thisRowSymbols != null) {
-                            if (thisRowSymbols.contains(startPosition - 1)
-                                    || (thisRowSymbols.contains(endPosition + 1))) {
-                                // System.out.println(number + " is adjacent to a symbol");
-                            }
-                        }
-
-                        i = endIndex;
-                    }
-
-                    // check if adjacent to a symbol
-
                 }
-
-                line = reader.readLine();
+                System.out.println();
             }
 
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found: " + e.getMessage());
         }
+        System.out.println(total);
     }
 
-    private static int findEndIndex(String line, int startIndex) {
-        int endIndex = startIndex;
+    public static Integer searchSurroundings(char[][] array2D, int row, int col) {
+        System.out.println("Symbol at: " + row + ", " + col);
+        int symTotal = 0;
+        for (int i = row - 1; i <= row + 1; i++) {
+            for (int j = col - 1; j <= col + 1; j++) {
+                // Skip out-of-bounds positions
+                if (i >= 0 && i < array2D.length && j >= 0 && j < array2D[0].length) {
+                    // Skip the center point itself
+                    if (!(i == row && j == col)) {
+                        char value = array2D[i][j];
+                        if (Character.isDigit(value)) {
+                            String number = extractNumberAtPosition2D(array2D, i, j);
+                            System.out.println("Number: " + number);
+                            symTotal += Integer.valueOf(number);
+                            // set number to not exist in the array anymore
+                            replaceNumberWithDots2D(array2D, i, j, number);
 
-        while (endIndex + 1 < line.length() && Character.isDigit(line.charAt(endIndex + 1))) {
+                        }
+                    }
+                }
+            }
+        }
+        return symTotal;
+    }
+
+    public static String extractNumberAtPosition2D(char[][] input, int row, int col) {
+        // Initialize indices for iterating in both directions
+        int startIndex = col;
+        int endIndex = col;
+
+        // Iterate to the left to find the start of the number
+        while (startIndex >= 0 && Character.isDigit(input[row][startIndex])) {
+            startIndex--;
+        }
+
+        // Iterate to the right to find the end of the number
+        while (endIndex < input[row].length && Character.isDigit(input[row][endIndex])) {
             endIndex++;
         }
 
-        return endIndex;
+        // Extract the number
+        String number = new String(input[row], startIndex + 1, endIndex - startIndex - 1);
+
+        // Optionally, convert the extracted number to dots
+        for (int i = startIndex + 1; i < endIndex; i++) {
+            input[row][i] = '.';
+        }
+
+        return number;
     }
 
-    private static void addValue(Map<Integer, List<Integer>> map, int key, int value) {
-        // If the key is not present, create a new ArrayList for it
-        map.putIfAbsent(key, new ArrayList<>());
+    public static void replaceNumberWithDots2D(char[][] input, int row, int col, String extractedNumber) {
+        int startIndex = col - (extractedNumber.length() - 1);
+        int endIndex = col + 1;
 
-        // Add the value to the list associated with the key
-        map.get(key).add(value);
+        // Replace the extracted number with dots
+        for (int i = startIndex; i < endIndex; i++) {
+            input[row][i] = '.';
+        }
     }
+
 }
