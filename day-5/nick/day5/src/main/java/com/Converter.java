@@ -1,11 +1,12 @@
-package main.java.com;
+package com;
+
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Converter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class Converter {
         destination.end = dest + len - 1;
         source.start = src;
         source.end = src + len - 1;
-
+        
         ranges.put(source, destination);
     }
 
