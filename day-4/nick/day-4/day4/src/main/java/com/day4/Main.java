@@ -5,86 +5,72 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        BufferedReader reader;
-        String filePath = "D:\\Coding\\AdventOfCode\\Advent-of-Code-2023\\day-4\\nick\\day-4\\day4\\src\\main\\resources\\input.txt";
-        int result = 0;
-        try {
-            reader = new BufferedReader(new FileReader(filePath));
-            String line = reader.readLine();
-            while (line != null) {
-                int total = 0;
-                // Separate the game number, numbers on the left, and numbers on the right
-                String[] separatedValues = separateGameNumbers(line);
-
-                // Print the results
-                System.out.println("Game Number: " + separatedValues[0]);
-                String[] winningNumbers = separatedValues[1].split("\\s+");
-                String[] ownedNumbers = separatedValues[2].split("\\s+");
-
-                // Convert arrays to sets for efficient comparison
-                Set<String> winningSet = new HashSet<>(Set.of(winningNumbers));
-                Set<String> ownedSet = new HashSet<>(Set.of(ownedNumbers));
-
-                // Find common elements (intersection)
-                Set<String> commonElements = new HashSet<>(winningSet);
-                commonElements.retainAll(ownedSet);
-
-                if (commonElements.size() > 0) {
-                    total = 1;
-                    for (int i = 1; i < commonElements.size(); i++) {
-                        total *= 2; // Double for each additional common element
-                    }
-                }
-
-                // Print the common elements
-                System.out.println("Common Elements: " + commonElements);
-                System.out.println(total);
-                result += total;
-
-                // Check if there are any common elements
-                if (commonElements.isEmpty()) {
-                    System.out.println("There are no common elements between numbers on the left and on the right.");
-                }
-                line = reader.readLine();
+        int res = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader("D:\\Coding\\AdventOfCode\\Advent-of-Code-2023\\day-4\\n" + //
+                "ick\\day-4\\day4\\src\\main\\resources\\input.txt"))) {
+            String line;
+            Map<Integer, List<String[]>> cardMap = new HashMap<>();
+            Map<Integer, Integer> cardCopies = new HashMap<>();
+            while ((line = br.readLine()) != null) {
+                String[] firstSplit = line.split(":");
+                String[] cardSplit = firstSplit[0].split("\\s+");
+                String[] secondSplit = firstSplit[1].split("\\|");
+                String[] winningNums = secondSplit[0].trim().split("\\s+");
+                String[] cardNums = secondSplit[1].trim().split("\\s+");
+                int currCardNum = Integer.parseInt(cardSplit[1]);
+                cardCopies.put(currCardNum, 1);
+                List<String[]> cardNumList = List.of(winningNums, cardNums);
+                cardMap.put(currCardNum, cardNumList);
             }
 
-            reader.close();
-        } catch (IOException e) {
+            for (Map.Entry<Integer, List<String[]>> entry : cardMap.entrySet()) {
+                List<String[]> cardList = entry.getValue();
+                copiesWon(cardList.get(0), cardList.get(1), entry.getKey(), cardCopies);
+            }
+
+            for (Map.Entry<Integer, Integer> entry : cardCopies.entrySet()) {
+                res += entry.getValue();
+            }
+
+            System.out.println("Answer: " + res);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(result);
+
     }
 
-    // Method to separate game number, numbers on the left, and numbers on the right
-    public static String[] separateGameNumbers(String inputLine) {
-        String[] result = new String[3];
-
-        // Split the input line based on the colon (:) to get the game number
-        String[] parts = inputLine.split(":");
-
-        // Extract and store the game number in the result array
-        result[0] = parts[0].trim().replaceAll("\\D", "");
-
-        // Split the second part (after the colon) based on the pipe character (|) to
-        // get numbers on the left and right
-        String[] numbers = parts[1].split("\\|");
-
-        // Trim leading and trailing whitespaces from each part
-        for (int i = 0; i < numbers.length; i++) {
-            numbers[i] = numbers[i].trim();
+    public static void copiesWon(String[] winningNums, String[] cardNums, int currCardNum, Map<Integer, Integer> cardCopies) {
+        int count = 0;
+        Map<String, Integer> freq = new HashMap<>();
+        for (String s : winningNums) {
+            freq.put(s, freq.getOrDefault(s, 0) + 1);
         }
 
-        // Extract and store the values in the result array
-        result[1] = numbers[0]; // Numbers on the left
-        result[2] = numbers[1]; // Numbers on the right
+        for (String s : cardNums) {
+            if (freq.containsKey(s)) {
+                freq.put(s, freq.get(s) - 1);
+            }
+        }
 
-        return result;
+        for (Map.Entry<String, Integer> entry : freq.entrySet()) {
+            if (entry.getValue() == 0) {
+                count++;
+            }
+        }
+
+        for (int i = 1; i <= count; i++) {
+            int currCardCopies = cardCopies.get(currCardNum);
+            cardCopies.put(currCardNum + i, cardCopies.get(currCardNum + i) + currCardCopies);
+        }
     }
-
 }
