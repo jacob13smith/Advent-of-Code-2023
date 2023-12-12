@@ -1,7 +1,5 @@
 package com.day6;
 
-import main.java.com.Converter;
-
 public class Main {
      public static void main(String[] args) {
         long time = 48876981;
