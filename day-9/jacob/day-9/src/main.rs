@@ -7,7 +7,8 @@ fn main() {
         let mut histories: Vec<Vec<i64>> = vec![];
         for line in lines {
             if let Ok(line_str) = line {
-                let history: Vec<i64> = line_str.split(" ").map(|x| x.parse::<i64>().unwrap()).collect();
+                let mut history: Vec<i64> = line_str.split(" ").map(|x| x.parse::<i64>().unwrap()).collect();
+                history.reverse();
                 histories.push(history);
             }
         }
@@ -16,42 +17,48 @@ fn main() {
         for history in histories {
             let mut i = history.len() - 1;
             let mut rows: Vec<Vec<i64>> = vec![];
-            let mut curr = history[i] - history[i-1];
+            let mut curr = -(history[i] - history[i-1]);
             let mut depth = 1;
-            while curr != 0 
-            {
+            'outer: loop{
                 if rows.len() < depth {
                     rows.push(vec![]);
                 }
-                let curr_row = rows.last_mut().unwrap();
+                let curr_row = rows.get_mut(depth - 1).unwrap();
                 curr_row.push(curr);
 
 
                 if curr_row.len() > 1 {
-                    // Handle when we can caluclate another neighbour
-                    curr = curr_row[curr_row.len() - 1] - curr;
+                    curr = -(curr_row[curr_row.len() - 2] - curr);
                     depth += 1;
+
+                    if depth == history.len() - 1{
+                        break 'outer;
+                    }
+
+
                 } else {
                     i -= 1;
-                    curr = history[i] - history[i-1];
+                    curr = -(history[i] - history[i-1]);
+                    depth = 1;
                 }
-
             }
 
-            for row in rows {
-                for item in row {
-                    print!("{} ", item);
-                }
-                println!();
-            }
-
-            let mut curr_sum = 0;
-            // for idx in rows.len()-1..=0 {
-            //     curr_sum += rows[idx].first().unwrap();
+            // for row in rows {
+            //     for item in row {
+            //         print!("{} ", item);
+            //     }
+            //     println!();
             // }
 
-            //println!("{}", history[history.len() - 1] + curr_sum);
+            let mut last = 0 ;
+            for idx in 0..rows.len() {
+                last = rows[rows.len() - idx - 1].first().unwrap() - last;
+            }
+            
+            sum += history[history.len() - 1] - last;
         }
+
+        println!("{}", sum);
 
     }
 }
