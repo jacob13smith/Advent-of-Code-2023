@@ -25,10 +25,10 @@ public class Main {
         cardValues.put('8', 8);
         cardValues.put('9', 9);
         cardValues.put('T', 10);
-        cardValues.put('J', 11);
-        cardValues.put('Q', 12);
-        cardValues.put('K', 13);
-        cardValues.put('A', 14);
+        cardValues.put('J', 1);
+        cardValues.put('Q', 11);
+        cardValues.put('K', 12);
+        cardValues.put('A', 13);
     }
 
     public static void main(String[] args) {
@@ -80,18 +80,54 @@ public class Main {
             int numPairs2 = 0;
             int numTriples1 = 0;
             int numTriples2 = 0;
+            int numJokers1 = count1[0];
+            int numJokers2 = count2[0];
+            int idxHighest1 = 0;
+            int idxHighest2 = 0;
+
 
             //count highest multiple
-            for (int i = 0; i < count1.length; i++) {
+            for (int i = 1; i < count1.length; i++) {
                 if (count1[i] > highest1) {
+                    //more multiples at count1[i]
+                    highest1 = count1[i];
+                    idxHighest1 = i;
+                } else if(count1[i] == highest1){
+                    //same number of multiples, eg: 2 4s and 2 5s
+                    if(i > idxHighest1){
+                        idxHighest1 = i;
+                    }
+                }
+
+                if (count2[i] > highest2) {
+                    highest2 = count2[i];
+                    idxHighest2 = i;
+                } else if(count2[i] == highest2){
+                    //same number of multiples, eg: 2 4s and 2 5s
+                    if(i > idxHighest2){
+                        idxHighest2 = i;
+                    }
+                } 
+            }
+            //add jokers
+            count1[idxHighest1] += numJokers1;
+            count2[idxHighest2] += numJokers2;
+
+            //recount multiples
+            //count highest multiple
+            for (int i = 1; i < count1.length; i++) {
+                if (count1[i] > highest1) {
+                    //more multiples at count1[i]
                     highest1 = count1[i];
                 }
+
                 if (count2[i] > highest2) {
                     highest2 = count2[i];
                 }
             }
+
             //count number of pairs and triples
-            for (int i = 0; i < count1.length; i++) {
+            for (int i = 1; i < count1.length; i++) {
                 //pairs
                 if (count1[i] == 2) {
                     numPairs1++;
@@ -143,11 +179,6 @@ public class Main {
                         }
                     }
                 }
-
-
-
-
-
                 return 1;
             }
 
@@ -160,17 +191,17 @@ public class Main {
 
         for (char digit : hand.toCharArray()) {
             if (digit >= '2' && digit <= '9') {
-                count[Character.getNumericValue(digit) - 2]++;
+                count[Character.getNumericValue(digit) - 1]++;
                 // System.out.println("digit: "+ digit + ": " +
                 // count[Character.getNumericValue(digit) - 2]);
             } else {
                 // Handle T, J, Q, K, A
                 switch (digit) {
                     case 'T':
-                        count[8]++;
+                        count[9]++;
                         break;
                     case 'J':
-                        count[9]++;
+                        count[0]++;
                         break;
                     case 'Q':
                         count[10]++;
