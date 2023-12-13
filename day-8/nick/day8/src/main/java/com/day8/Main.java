@@ -20,14 +20,14 @@ public class Main {
     public static void main(String[] args) {
 
         String filePath = "D:\\Coding\\AdventOfCode\\Advent-of-Code-2023\\day-8\\nick\\day8\\src\\main\\resources\\input.txt";
-        Pattern pattern = Pattern.compile("([A-Za-z]+) = \\(([A-Za-z]+), ([A-Za-z]+)\\)");
+        Pattern pattern = Pattern.compile("(\\w+) = \\((\\w+), (\\w+)\\)");
         ArrayList<Character> instructions = new ArrayList<Character>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             // Read the first line and store it in a char array
             String instructionsLine = reader.readLine();
             char[] instructionsArr = instructionsLine.toCharArray();
-            for(char c : instructionsArr){
+            for (char c : instructionsArr) {
                 instructions.add(c);
             }
 
@@ -43,8 +43,8 @@ public class Main {
                     String leftChoice = matcher.group(2);
                     String rightChoice = matcher.group(3);
 
-                    //populate inputmap
-                    inputMap.put(currentStep, new String[]{leftChoice, rightChoice});
+                    // populate inputmap
+                    inputMap.put(currentStep, new String[] { leftChoice, rightChoice });
 
                 }
             }
@@ -52,27 +52,52 @@ public class Main {
             e.printStackTrace();
         }
 
-        String nextStep = "AAA";
+        for (Map.Entry<String, String[]> entry : inputMap.entrySet()) {
+            String key = entry.getKey();
+            String value1 = entry.getValue()[0];
+            String value2 = entry.getValue()[1];
+            //System.out.println("Key: " + key + ", Value: " + value1 + ", " + value2);
+        }
+
+        String nextStep = "KNA";
         int instructionIdx = 0;
         int numberOfSteps = 0;
-        while(!nextStep.equals("ZZZ")){
-            if(instructionIdx > instructions.size() - 1){
+        while (!nextStep.endsWith("Z")) {
+            if (instructionIdx > instructions.size() - 1) {
                 instructionIdx = 0;
             }
             char currentInstruction = instructions.get(instructionIdx);
-            if(currentInstruction == 'R'){
-                //get right choice
+            if (currentInstruction == 'R') {
+                // get right choice
                 nextStep = inputMap.get(nextStep)[1];
                 instructionIdx++;
-            } else if(currentInstruction == 'L'){
-                //get left choice
+            } else if (currentInstruction == 'L') {
+                // get left choice
                 nextStep = inputMap.get(nextStep)[0];
                 instructionIdx++;
             }
             numberOfSteps++;
         }
         System.out.println(numberOfSteps);
+        System.out.println(LCM(284793035507L, 13207));
+    }
 
+    /**
+     * Calculate Lowest Common Multiplier
+     */
+    public static long LCM(long a, long b) {
+        return (a * b) / GCF(a, b);
+    }
+
+    /**
+     * Calculate Greatest Common Factor
+     */
+    public static long GCF(long a, long b) {
+        if (b == 0) {
+            return a;
+        } else {
+            return (GCF(b, a % b));
+        }
     }
 
 }
