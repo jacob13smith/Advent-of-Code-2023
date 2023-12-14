@@ -19,7 +19,7 @@ public class Main {
             while (line != null) {
                 ArrayList<Integer> values = new ArrayList<Integer>();
                 ArrayList<Integer> differences = new ArrayList<>();
-                ArrayList<Integer> endValues = new ArrayList<>();
+                ArrayList<Integer> beginningValues = new ArrayList<>();
                 String[] stringVals = line.split(" ");
 
                 // populate values from string input
@@ -28,28 +28,28 @@ public class Main {
                     values.add(intVal);
                 }
 
-                endValues.add(values.get(values.size() - 1));
+                beginningValues.add(values.get(0));
                 
                 differences = calculateDifferences(values);
 
                 boolean loopCanTerminate = false;
 
                 while(!loopCanTerminate){
-                    endValues.add(differences.get(differences.size() - 1));
+                    beginningValues.add(differences.get(0));
                     differences = calculateDifferences(differences);
                     if(!checkForNonZeroes(differences)){
                         loopCanTerminate = true;
                     }
                 }
-
                 int numToAdd = 0;
-                for(int i = endValues.size() - 1; i >= 0; i--){
-                    numToAdd += endValues.get(i);
+                for(int i = beginningValues.size() - 1; i >= 0; i--){
+                    int temp = beginningValues.get(i) - numToAdd;
+                    numToAdd = temp;
                 }
                 result += numToAdd;
                 line = reader.readLine();
             }
-
+            
             System.out.println(result);
             reader.close();
         } catch (IOException e) {
