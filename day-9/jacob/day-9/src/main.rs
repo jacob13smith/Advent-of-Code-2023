@@ -26,7 +26,6 @@ fn main() {
                 let curr_row = rows.get_mut(depth - 1).unwrap();
                 curr_row.push(curr);
 
-
                 if curr_row.len() > 1 {
                     curr = -(curr_row[curr_row.len() - 2] - curr);
                     depth += 1;
@@ -34,7 +33,6 @@ fn main() {
                     if depth == history.len() - 1{
                         break 'outer;
                     }
-
 
                 } else {
                     i -= 1;
@@ -57,9 +55,7 @@ fn main() {
             
             sum += history[history.len() - 1] - last;
         }
-
         println!("{}", sum);
-
     }
 }
 
