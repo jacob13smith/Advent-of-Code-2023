@@ -6,15 +6,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Main {
     public static void main(String[] args) {
 
-        String filePath = "C:\\Users\\nickh\\OneDrive\\Desktop\\Code\\AdventOfCode\\Advent-of-Code-2023\\day-11\\nick\\day11\\src\\main\\resources\\input.txt";
+        String filePath = "D:\\Coding\\AdventOfCode\\Advent-of-Code-2023\\day-11\\n" + //
+                "ick\\day11\\src\\main\\resources\\input.txt";
         // Define the size of the 2D array based on the number of rows and columns in
         // the input
-        int numRows = 10;
-        int numCols = 10;
+        int numRows = 140;
+        int numCols = 140;
 
         // Create a 2D array
         char[][] array2D = new char[numRows][numCols];
@@ -37,11 +40,23 @@ public class Main {
         }
 
         // expand array
-        expandArray(array2D);
+        char[][] expandedArr = expandArray(array2D);
+        List<Point> points = findPoints(expandedArr);
 
+        int totalDist = 0;
+
+        for (int i = 0; i < points.size() - 1; i++) {
+            for (int j = i + 1; j > i && j < points.size(); j++) {
+                if (i != j) {
+                    int dist = shortestDistance(expandedArr, points.get(i), points.get(j));
+                    totalDist += dist;
+                }
+            }
+        }
+        System.out.println("Dist: " + totalDist);
     }
 
-    public static void expandArray(char[][] grid) {
+    public static char[][] expandArray(char[][] grid) {
         int gridRows = grid.length;
         ArrayList<Integer> rowsToAdd = new ArrayList<Integer>();
 
@@ -51,7 +66,6 @@ public class Main {
                 rowList.add(c);
             }
             if (!rowList.contains('#')) {
-                System.out.println("Line on row " + i);
                 rowsToAdd.add(i);
             }
         }
@@ -65,24 +79,15 @@ public class Main {
                 colList.add(grid[row][col]);
             }
             if (!colList.contains('#')) {
-                System.out.println("Line on col " + col);
                 colsToAdd.add(col);
             }
         }
 
-        int newRowLen = gridRows + rowsToAdd.size();
-        int newColLen = gridCols + colsToAdd.size();
-        char[][] newGrid = duplicateRowsAndColumns(grid, rowsToAdd, colsToAdd);
-
-        for(int i = 0; i < newGrid.length; i++){
-            for(int j = 0; j < newGrid[0].length; j++){
-                //System.out.print(newGrid[i][j]);
-            }
-        }
-
+        return duplicateRowsAndColumns(grid, rowsToAdd, colsToAdd);
     }
 
-    public static char[][] duplicateRowsAndColumns(char[][] inputArray, List<Integer> rowsToAdd, List<Integer> colsToAdd) {
+    public static char[][] duplicateRowsAndColumns(char[][] inputArray, List<Integer> rowsToAdd,
+            List<Integer> colsToAdd) {
         int numRows = inputArray.length;
         int numCols = inputArray[0].length;
 
@@ -93,28 +98,96 @@ public class Main {
             char[] currentRow = inputArray[row];
 
             if (rowsToAdd.contains(row)) {
-                System.out.println("Adding Dupe Row: " + row);
-                resultRows.add(currentRow.clone());  // Clone the row if it needs to be duplicated
+                resultRows.add(currentRow.clone()); // Clone the row if it needs to be duplicated
             }
 
             resultRows.add(currentRow);
         }
-        List<char[]> newRows = new ArrayList<>();
 
-        for(int i = 0; i < resultRows.size(); i++){
-            char[] currentRow = resultRows.get(i);
-            
-            for(int j = 0; j < resultRows.get(0).length + colsToAdd.size(); j++){
-            }
-            for(char c : rowWithNewCols){
-                System.out.print(c);
-            }
-            System.out.println();
+        List<char[]> resultList = duplicateColumnsInPlace(resultRows, colsToAdd);
+        char[][] result = convertToListToArray(resultList);
+
+        return result;
+    }
+
+    public static List<char[]> duplicateColumnsInPlace(List<char[]> matrix, List<Integer> columnsToDuplicate) {
+        // Validate input
+        if (matrix == null || matrix.isEmpty() || matrix.get(0).length == 0 || columnsToDuplicate == null
+                || columnsToDuplicate.isEmpty()) {
+            throw new IllegalArgumentException("Invalid input");
         }
 
+        // Iterate through each row in the matrix
+        for (int rowIndex = 0; rowIndex < matrix.size(); rowIndex++) {
+            char[] originalRow = matrix.get(rowIndex);
+            int originalColumns = originalRow.length;
+            int additionalColumns = columnsToDuplicate.size();
 
+            // Create a new row with expanded size
+            char[] newRow = new char[originalColumns + additionalColumns];
 
-        //char[][] resultArray = new char[resultRows.size()][newNumCols];
-        return null;
+            // Copy the original columns, inserting duplicates in place
+            for (int colIndex = 0, newColIndex = 0; colIndex < originalColumns; colIndex++, newColIndex++) {
+                if (columnsToDuplicate.contains(colIndex)) {
+                    // Duplicate the column and insert it before the current column
+                    newRow[newColIndex] = originalRow[colIndex];
+                    newColIndex++;
+                }
+                newRow[newColIndex] = originalRow[colIndex];
+            }
+
+            // Update the matrix with the new row
+            matrix.set(rowIndex, newRow);
+        }
+
+        return matrix;
     }
+
+    public static char[][] convertToListToArray(List<char[]> list) {
+        char[][] array = new char[list.size()][];
+        for (int i = 0; i < list.size(); i++) {
+            array[i] = list.get(i);
+        }
+        return array;
+    }
+
+    public static int shortestDistance(char[][] grid, Point start, Point end) {
+        int xDiff = Math.abs(end.x - start.x);
+        int yDiff = Math.abs(end.y - start.y );
+
+        return xDiff + yDiff;
+    }
+
+    private static boolean isValid(int x, int y, int rows, int cols) {
+        return x >= 0 && x < rows && y >= 0 && y < cols;
+    }
+
+    public static List<Point> findPoints(char[][] grid) {
+        List<Point> points = new ArrayList<>();
+
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[0].length; y++) {
+                if (grid[x][y] != '.') {
+                    points.add(new Point(x, y));
+                }
+            }
+        }
+
+        return points;
+    }
+
+    static class Point {
+        int x, y;
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + x + ", " + y + ")";
+        }
+    }
+
 }
