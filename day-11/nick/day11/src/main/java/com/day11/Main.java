@@ -8,8 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 public class Main {
+    public static List<Integer> duplicatedColumns = new ArrayList<Integer>();
+    public static List<Integer> duplicatedRows = new ArrayList<Integer>();
+
     public static void main(String[] args) {
 
         String filePath = "D:\\Coding\\AdventOfCode\\Advent-of-Code-2023\\day-11\\n" + //
@@ -53,6 +57,7 @@ public class Main {
                 }
             }
         }
+
         System.out.println("Dist: " + totalDist);
     }
 
@@ -94,11 +99,15 @@ public class Main {
         List<char[]> resultRows = new ArrayList<>();
 
         // Duplicate rows
+        int rowCount = 0;
         for (int row = 0; row < numRows; row++) {
             char[] currentRow = inputArray[row];
-
             if (rowsToAdd.contains(row)) {
                 resultRows.add(currentRow.clone()); // Clone the row if it needs to be duplicated
+                if (!duplicatedRows.contains(row)) {
+                    duplicatedRows.add(row + rowCount);
+                    rowCount++;
+                }
             }
 
             resultRows.add(currentRow);
@@ -131,6 +140,9 @@ public class Main {
                 if (columnsToDuplicate.contains(colIndex)) {
                     // Duplicate the column and insert it before the current column
                     newRow[newColIndex] = originalRow[colIndex];
+                    if (!duplicatedColumns.contains(newColIndex)) {
+                        duplicatedColumns.add(newColIndex);
+                    }
                     newColIndex++;
                 }
                 newRow[newColIndex] = originalRow[colIndex];
@@ -153,13 +165,17 @@ public class Main {
 
     public static int shortestDistance(char[][] grid, Point start, Point end) {
         int xDiff = Math.abs(end.x - start.x);
-        int yDiff = Math.abs(end.y - start.y );
+        int yDiff = Math.abs(end.y - start.y);
+        // return xDiff + yDiff;
 
-        return xDiff + yDiff;
-    }
-
-    private static boolean isValid(int x, int y, int rows, int cols) {
-        return x >= 0 && x < rows && y >= 0 && y < cols;
+        // System.out.println("X Dist========");
+        int xDist = calculateDistanceWithList(start.x, end.x, duplicatedRows);
+        // System.out.println("Y Dist=======");
+        int yDist = calculateDistanceWithList(start.y, end.y, duplicatedColumns);
+        int returnDist = xDist + yDist;
+        // System.out.println(returnDist);
+        // System.out.println();
+        return returnDist;
     }
 
     public static List<Point> findPoints(char[][] grid) {
@@ -188,6 +204,37 @@ public class Main {
         public String toString() {
             return "(" + x + ", " + y + ")";
         }
+    }
+
+    public static int calculateDistanceWithList(int startNumber, int endNumber, List<Integer> numberList) {
+        int distance = 0;
+        // System.out.println(startNumber + " : " + endNumber);
+        // Iterate from startNumber to endNumber
+        if(startNumber < endNumber){
+            for (int i = startNumber; i < endNumber; i++) {
+                // Check if the current number is in the list
+                
+                if (numberList.contains(i)) {
+                    // System.out.println(i);
+                    distance += 999999;
+                }
+    
+                distance++; // Increment the distance for each step
+            }
+        } else if (startNumber > endNumber) {
+            for (int i = endNumber; i < startNumber; i++) {
+                // Check if the current number is in the list
+                
+                if (numberList.contains(i)) {
+                    // System.out.println(i);
+                    distance += 999999;
+                }
+    
+                distance++; // Increment the distance for each step
+            }
+        }
+        // System.out.println("Dist: " + distance);
+        return distance;
     }
 
 }
