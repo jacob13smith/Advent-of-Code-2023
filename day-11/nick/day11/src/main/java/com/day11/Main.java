@@ -47,12 +47,12 @@ public class Main {
         char[][] expandedArr = expandArray(array2D);
         List<Point> points = findPoints(expandedArr);
 
-        int totalDist = 0;
+        long totalDist = 0;
 
         for (int i = 0; i < points.size() - 1; i++) {
             for (int j = i + 1; j > i && j < points.size(); j++) {
                 if (i != j) {
-                    int dist = shortestDistance(expandedArr, points.get(i), points.get(j));
+                    long dist = shortestDistance(expandedArr, points.get(i), points.get(j));
                     totalDist += dist;
                 }
             }
@@ -163,18 +163,19 @@ public class Main {
         return array;
     }
 
-    public static int shortestDistance(char[][] grid, Point start, Point end) {
+    public static long shortestDistance(char[][] grid, Point start, Point end) {
         int xDiff = Math.abs(end.x - start.x);
         int yDiff = Math.abs(end.y - start.y);
         // return xDiff + yDiff;
 
         // System.out.println("X Dist========");
-        int xDist = calculateDistanceWithList(start.x, end.x, duplicatedRows);
+        long xDist = calculateDistanceWithList(start.x, end.x, duplicatedRows);
         // System.out.println("Y Dist=======");
-        int yDist = calculateDistanceWithList(start.y, end.y, duplicatedColumns);
-        int returnDist = xDist + yDist;
-        // System.out.println(returnDist);
-        // System.out.println();
+        long yDist = calculateDistanceWithList(start.y, end.y, duplicatedColumns);
+        long returnDist = xDist + yDist;
+        //  System.out.println("TOTALDIST: " + returnDist);
+        //  System.out.println();
+        //  System.out.println();
         return returnDist;
     }
 
@@ -206,34 +207,37 @@ public class Main {
         }
     }
 
-    public static int calculateDistanceWithList(int startNumber, int endNumber, List<Integer> numberList) {
-        int distance = 0;
-        // System.out.println(startNumber + " : " + endNumber);
+    public static long calculateDistanceWithList(int startNumber, int endNumber, List<Integer> numberList) {
+        long distance = 0;
+        //System.out.println("Start: " + startNumber + ", End: " + endNumber);
         // Iterate from startNumber to endNumber
-        if(startNumber < endNumber){
+        if (startNumber < endNumber) {
             for (int i = startNumber; i < endNumber; i++) {
                 // Check if the current number is in the list
-                
                 if (numberList.contains(i)) {
-                    // System.out.println(i);
-                    distance += 999999;
+                    //System.out.println("MULTIPLIED i AT: " + i);
+                    distance += 999998;
                 }
-    
+
+                //System.out.println("STEP AT: " + i);
                 distance++; // Increment the distance for each step
             }
         } else if (startNumber > endNumber) {
             for (int i = endNumber; i < startNumber; i++) {
                 // Check if the current number is in the list
-                
+
                 if (numberList.contains(i)) {
-                    // System.out.println(i);
-                    distance += 999999;
+                    //System.out.println("---MULTIPLIED i AT: " + i);
+
+                    //System.out.println(i);
+                    distance += 999998;
                 }
-    
+                //System.out.println("---STEP AT: " + i);
+
                 distance++; // Increment the distance for each step
             }
         }
-        // System.out.println("Dist: " + distance);
+        //System.out.println("Dist: " + distance);
         return distance;
     }
 
